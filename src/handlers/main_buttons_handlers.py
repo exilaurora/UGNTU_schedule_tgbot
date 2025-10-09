@@ -8,9 +8,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
-from filters.has_group import HasGroupFilter
-from filters.is_today_schedule import IsTodaySchedule
-from filters.is_changing_group import IsChangingGroup
+from filters.group_configured import GroupConfigured
 from rusoil_api import RusoilAPI, NowInfo
 from states.user_state import UserState
 
@@ -128,7 +126,7 @@ def make_day_keyboard(week: int, day: int, group: str, subgroup: int) -> InlineK
 
 # === Хэндлеры ===
 
-@router.message(IsTodaySchedule(), HasGroupFilter())
+@router.message(GroupConfigured(), lambda message: message.text == "📅 Расписание на сегодня")
 async def schedule_today(message: Message, state: FSMContext, api: RusoilAPI):
     now, now_from_cache = await get_now_safe(api)
     if not now:
@@ -149,7 +147,7 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilAPI):
     await message.answer(text, reply_markup=make_day_keyboard(now.week_number, now.day_of_week, group, subgroup))
 
 
-@router.callback_query(F.data.startswith("dw:"), HasGroupFilter())
+@router.callback_query(F.data.startswith("dw:"), GroupConfigured())
 async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI):
     if not callback.data or not isinstance(callback.message, Message):
         return
@@ -188,7 +186,7 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI)
     await callback.answer()
 
 
-@router.message(IsChangingGroup())
+@router.message(lambda message: message.text == "🔄 Сменить группу")
 async def change_group(message: Message, state: FSMContext):
     await message.answer("Введи свою группу", reply_markup=ReplyKeyboardRemove())
     await state.clear()
