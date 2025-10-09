@@ -113,10 +113,10 @@ def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from
     return "\n".join(lines)
 
 
-def make_day_keyboard(week: int, day: int, group: str) -> InlineKeyboardMarkup:
-    today_data = json.dumps({"week": -1, "day": -1, "g": group})
-    tomorrow_data = json.dumps({"week": week + 1, "day": 1, "g": group}) if day == 7 else json.dumps({"week": week, "day": day + 1, "g": group})
-    yesterday_data = json.dumps({"week": max(1, week - 1), "day": 7, "g": group}) if day == 1 else json.dumps({"week": week, "day": day - 1, "g": group})
+def make_day_keyboard(week: int, day: int, group: str, subgroup: int) -> InlineKeyboardMarkup:
+    today_data = json.dumps({"w": -1, "d": -1, "g": group, "s": subgroup})
+    tomorrow_data = json.dumps({"w": week + 1, "d": 1, "g": group, "s": subgroup}) if day == 7 else json.dumps({"w": week, "d": day + 1, "g": group, "s": subgroup})
+    yesterday_data = json.dumps({"w": max(1, week - 1), "d": 7, "g": group, "s": subgroup}) if day == 1 else json.dumps({"w": week, "d": day - 1, "g": group, "s": subgroup})
 
     return InlineKeyboardMarkup(
         inline_keyboard=[[
@@ -146,7 +146,7 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilAPI):
 
     today_obj = next((d for d in days if d.day_of_week == now.day_of_week), None)
     text = render_schedule_text(group, today_obj, days_names[now.day_of_week], subgroup, True if now_from_cache or days_from_cache else False)
-    await message.answer(text, reply_markup=make_day_keyboard(now.week_number, now.day_of_week, group))
+    await message.answer(text, reply_markup=make_day_keyboard(now.week_number, now.day_of_week, group, subgroup))
 
 
 @router.callback_query(F.data.startswith("dw:"), HasGroupFilter())
@@ -158,26 +158,26 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI)
     day_data = json.loads(callback.data[3:])
     state_data = await state.get_data()
     group = state_data["group"] if day_data.get("g") is None else day_data["g"]
-    subgroup = state_data.get("subgroup", 0)
+    subgroup = state_data.get("subgroup", 0) if day_data.get("s") is None else day_data["s"]
 
     now_from_cache = False
 
-    if day_data["week"] == -1 and day_data["day"] == -1:
+    if day_data["w"] == -1 and day_data["d"] == -1:
         now, now_from_cache = await get_now_safe(api)
         if not now:
             await message.answer("⚠️ Не удалось получить текущий день, и кэш пуст.")
             return
-        day_data.update({"week": now.week_number, "day": now.day_of_week})
+        day_data.update({"w": now.week_number, "d": now.day_of_week})
 
-    days, days_from_cache = await get_schedule_safe(api, group, day_data["week"])
+    days, days_from_cache = await get_schedule_safe(api, group, day_data["w"])
     if not days:
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return
 
-    today_obj = next((d for d in days if d.day_of_week == day_data["day"]), None)
-    text = render_schedule_text(group, today_obj, days_names[day_data["day"]], subgroup, True if now_from_cache or days_from_cache else False)
+    today_obj = next((d for d in days if d.day_of_week == day_data["d"]), None)
+    text = render_schedule_text(group, today_obj, days_names[day_data["d"]], subgroup, True if now_from_cache or days_from_cache else False)
     try:
-        await message.edit_text(text, reply_markup=make_day_keyboard(day_data["week"], day_data["day"], group))
+        await message.edit_text(text, reply_markup=make_day_keyboard(day_data["w"], day_data["d"], group, subgroup))
     except TelegramBadRequest as e:
         pass
     await callback.answer()
