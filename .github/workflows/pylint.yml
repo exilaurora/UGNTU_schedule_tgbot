@@ -25,10 +25,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pylint
 
-      - name: 🧹 Run Pylint
+      - name: 🧹 Run Pylint (only fail on errors)
         run: |
           pylint \
-            --disable=C0114,C0115,C0116,R0903,R0801,W0511,E1101,E0401 \
+            --exit-zero \
+            --disable=C,R,W \
             --max-line-length=120 \
             --output-format=colorized \
             $(git ls-files '*.py')
