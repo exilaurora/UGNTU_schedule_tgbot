@@ -1,6 +1,6 @@
 from aiogram import Router, html, F
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 
 from rusoil_api import RusoilAPI
@@ -17,7 +17,7 @@ async def command_start(message: Message, state: FSMContext):
     if not user:
         return
 
-    await message.answer("Привет! Введи свою группу")
+    await message.answer("Привет! Введи свою группу", reply_markup=ReplyKeyboardRemove())
     await state.set_state(UserState.waiting_for_group)
 
 async def update_group(message: Message, state: FSMContext, api: RusoilAPI, group_name: str):
