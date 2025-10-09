@@ -1,0 +1,10 @@
+/bin/
+/include/
+/lib/
+/lib64
+/src/**/__pycache__/
+/src_backup/
+/run.sh
+/docker-compose.yml
+/rasp_bot.docker
+/pyvenv.cfg
