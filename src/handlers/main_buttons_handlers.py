@@ -3,7 +3,7 @@ import time
 import logging
 from typing import Optional
 
-from aiogram import Router, html, F
+from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
@@ -85,7 +85,7 @@ async def get_schedule_safe(api: RusoilAPI, group: str, week: int) -> tuple[Opti
 def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from_cache: bool = False) -> str:
     if not day_obj or not day_obj.lessons:
         return f"📅 Расписание на {day_name} ({group}):\n\n" \
-               f"Пар нет 🎉 {html.spoiler('наверное')}"
+               "Пар нет 🎉"
 
     lines = []
     if from_cache:
