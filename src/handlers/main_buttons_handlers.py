@@ -160,24 +160,29 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI)
     group = state_data["group"] if day_data.get("g") is None else day_data["g"]
     subgroup = state_data.get("subgroup", 0) if day_data.get("s") is None else day_data["s"]
 
+    week = day_data["w"] if day_data.get("w") is not None else day_data["week"]
+    day = day_data["d"] if day_data.get("d") is not None else day_data["day"]
+
     now_from_cache = False
 
-    if day_data["w"] == -1 and day_data["d"] == -1:
+    if week == -1 and day == -1:
         now, now_from_cache = await get_now_safe(api)
         if not now:
             await message.answer("⚠️ Не удалось получить текущий день, и кэш пуст.")
             return
+        week = now.week_number
+        day = now.day_of_week
         day_data.update({"w": now.week_number, "d": now.day_of_week})
 
-    days, days_from_cache = await get_schedule_safe(api, group, day_data["w"])
+    days, days_from_cache = await get_schedule_safe(api, group, week)
     if not days:
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return
 
-    today_obj = next((d for d in days if d.day_of_week == day_data["d"]), None)
-    text = render_schedule_text(group, today_obj, days_names[day_data["d"]], subgroup, True if now_from_cache or days_from_cache else False)
+    today_obj = next((d for d in days if d.day_of_week == day), None)
+    text = render_schedule_text(group, today_obj, days_names[day], subgroup, True if now_from_cache or days_from_cache else False)
     try:
-        await message.edit_text(text, reply_markup=make_day_keyboard(day_data["w"], day_data["d"], group, subgroup))
+        await message.edit_text(text, reply_markup=make_day_keyboard(week, day, group, subgroup))
     except TelegramBadRequest as e:
         pass
     await callback.answer()
