@@ -125,6 +125,7 @@ networks:
 | `MONGO_USER`     | Имя пользователя базы                                                  |
 | `MONGO_PASSWORD` | Пароль                                                                 |
 | `MONGO_DB`       | Имя базы данных                                                        |
+| `ADMIN_USERID`   | UserID админа. Нужно для доступа к команде `/BreakAPI`                 |
 
 ---
 
