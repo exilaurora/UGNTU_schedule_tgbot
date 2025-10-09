@@ -10,12 +10,6 @@ router = Router()
 
 @router.inline_query()
 async def inline_query_handler(query: InlineQuery, state: FSMContext, api: RusoilAPI):
-    text = query.query.strip()
-    if not text:
-        return
-    
-    # query.from_user
-
     results = []
 
     data = await state.get_data()
