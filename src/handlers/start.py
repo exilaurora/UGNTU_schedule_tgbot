@@ -68,7 +68,7 @@ async def find_group(message: Message, state: FSMContext, api: RusoilAPI):
 
 
     await message.answer(
-        "Выберите свою группу:",
+        "Выбери свою группу:",
         reply_markup=keyboard
     )
     await state.set_state(UserState.waiting_for_group_choice)
