@@ -5,7 +5,7 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
-from rusoil_api import RusoilAPI
+from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 
 from filters.admin import Admin
 
@@ -17,15 +17,15 @@ repairKeyboard = InlineKeyboardMarkup(inline_keyboard=[
 
 
 @router.message(Command(commands=["BreakAPI"]), Admin())
-async def HandleAPIErrorCommand(message: Message, api: RusoilAPI):
+async def HandleAPIErrorCommand(message: Message, api: RusoilSafeAPI):
     api.BASE_URL = "https://example.com" # pyright: ignore[reportAttributeAccessIssue]
     logging.info("Активирована симуляция недоступности API")
     await message.reply("Активирована симуляция недоступности API", reply_markup=repairKeyboard)
 
 
 @router.callback_query(F.data == ("BreakAPI:cancel"))
-async def HandleAPIRepairQuery(callback: CallbackQuery, api: RusoilAPI):
-    api.BASE_URL = RusoilAPI.BASE_URL
+async def HandleAPIRepairQuery(callback: CallbackQuery, api: RusoilSafeAPI):
+    api.BASE_URL = RusoilSafeAPI.BASE_URL
     logging.info("Симуляция недоступности API отключена")
     await callback.answer()
     if (message:= callback.message) and isinstance(message, Message):

@@ -9,7 +9,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.mongo import MongoStorage
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from rusoil_api import RusoilAPI
+from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 from middlewares.api_middleware import RusoilAPIMiddleware
 from middlewares.cooldown_middleware import CooldownMiddleware
 from handlers import register_handlers
@@ -34,7 +34,7 @@ async def main():
     storage = MongoStorage(client=client, db_name="mydatabase")
     dp = Dispatcher(storage=storage)
 
-    api = RusoilAPI()
+    api = RusoilSafeAPI()
     await api.__aenter__()
 
     dp.update.middleware(RusoilAPIMiddleware(api))

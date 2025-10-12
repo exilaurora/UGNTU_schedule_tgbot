@@ -2,7 +2,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from typing import Any, Awaitable, Callable, Dict
 
-from rusoil_api import RusoilAPI
+from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 
 
 class RusoilAPIMiddleware(BaseMiddleware):
@@ -11,7 +11,7 @@ class RusoilAPIMiddleware(BaseMiddleware):
     как аргумент в каждый хэндлер (если он его принимает).
     """
 
-    def __init__(self, api: RusoilAPI):
+    def __init__(self, api: RusoilSafeAPI):
         super().__init__()
         self.api = api
 
@@ -21,5 +21,5 @@ class RusoilAPIMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any]
     ) -> Any:
-        data["api"] = self.api  # 👈 теперь aiogram сможет передавать api=...
+        data["api"] = self.api
         return await handler(event, data)

@@ -9,7 +9,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
 from filters.group_configured import GroupConfigured
-from rusoil_api import RusoilAPI, NowInfo
+from rusoil_api.rusoil_baseapi import RusoilAPI, NowInfo
+from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 from states.user_state import UserState
 
 
@@ -69,7 +70,7 @@ async def get_schedule_safe(api: RusoilAPI, group: str, week: int) -> tuple[Opti
 
     # иначе пробуем запросить с API
     try:
-        days = await api.get_schedule(group, week)
+        days = await api.get_schedule(group, week, week)
         cache[cache_key] = {"days": days, "time": time.time()}
         logging.info(f"[CACHE] Обновлено: {cache_key}")
         return days, False
@@ -127,8 +128,8 @@ def make_day_keyboard(week: int, day: int, group: str, subgroup: int) -> InlineK
 # === Хэндлеры ===
 
 @router.message(GroupConfigured(), lambda message: message.text == "📅 Расписание на сегодня")
-async def schedule_today(message: Message, state: FSMContext, api: RusoilAPI):
-    now, now_from_cache = await get_now_safe(api)
+async def schedule_today(message: Message, state: FSMContext, api: RusoilSafeAPI):
+    now, now_from_cache = await api.GetNow() # get_now_safe(api)
     if not now:
         await message.reply("⚠️ Не удалось получить текущую дату, и кэш пуст.")
         return
@@ -137,7 +138,7 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilAPI):
     group = data["group"]
     subgroup = data.get("subgroup", 0)
 
-    days, days_from_cache = await get_schedule_safe(api, group, now.week_number)
+    days, days_from_cache = await api.GetSchedule(group, now.week_number) # get_schedule_safe(api, group, now.week_number)
     if not days:
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return
@@ -148,7 +149,7 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilAPI):
 
 
 @router.callback_query(F.data.startswith("dw:"), GroupConfigured())
-async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI):
+async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafeAPI):
     if not callback.data or not isinstance(callback.message, Message):
         return
 
@@ -164,7 +165,7 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI)
     now_from_cache = False
 
     if week == -1 and day == -1:
-        now, now_from_cache = await get_now_safe(api)
+        now, now_from_cache = await api.GetNow() # get_now_safe(api)
         if not now:
             await message.answer("⚠️ Не удалось получить текущий день, и кэш пуст.")
             return
@@ -172,7 +173,7 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilAPI)
         day = now.day_of_week
         day_data.update({"w": now.week_number, "d": now.day_of_week})
 
-    days, days_from_cache = await get_schedule_safe(api, group, week)
+    days, days_from_cache = await api.GetSchedule(group, week) # get_schedule_safe(api, group, week)
     if not days:
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return

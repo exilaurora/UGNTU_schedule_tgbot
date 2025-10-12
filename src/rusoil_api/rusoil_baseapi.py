@@ -169,10 +169,12 @@ class RusoilAPI:
             raise RusoilInvalidResponse(f"Unexpected response: {data}")
         return [Group.from_dict(g) for g in data["groups"]]
 
-    async def get_schedule(self, group: str, beginweek: int) -> List[Day]:
+    async def get_schedule(self, group: str, beginweek: int, endweek: Optional[int]) -> List[Day]:
+        if not isinstance(endweek, int):
+            endweek = beginweek
         lessons_data = await self._post(
             "get_rasp_student",
-            {"gruppa": group, "beginweek": beginweek, "endweek": beginweek},
+            {"gruppa": group, "beginweek": beginweek, "endweek": endweek},
         )
 
         if not isinstance(lessons_data, list):

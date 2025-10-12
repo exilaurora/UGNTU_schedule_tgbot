@@ -5,13 +5,14 @@ from aiogram.fsm.context import FSMContext
 from states.user_state import UserState
 from handlers.main_buttons_handlers import change_group
 
-from rusoil_api import RusoilAPI
+# from rusoil_api.rusoil_baseapi import RusoilAPI
+from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 from keyboards.main_menu import main_menu
 
 
 router = Router()
 
-async def update_group(message: Message, state: FSMContext, api: RusoilAPI, group_name: str):
+async def update_group(message: Message, state: FSMContext, group_name: str):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -27,12 +28,12 @@ async def update_group(message: Message, state: FSMContext, api: RusoilAPI, grou
 
 
 @router.message(UserState.waiting_for_group)
-async def find_group(message: Message, state: FSMContext, api: RusoilAPI):
+async def find_group(message: Message, state: FSMContext, api: RusoilSafeAPI):
     if not message.text:
         return
     group_name = message.text.strip()
 
-    groups = await api.get_groups(group_name)
+    groups, _ = await api.GetGroups(group_name) # api.get_groups(group_name)
 
     if not groups:
         await message.answer("Группа не найдена. Попробуй еще раз")
@@ -40,7 +41,7 @@ async def find_group(message: Message, state: FSMContext, api: RusoilAPI):
 
     exact = next((g for g in groups if g.name.lower() == group_name.lower()), None)
     if exact:
-        await update_group(message, state, api, exact.name)
+        await update_group(message, state, exact.name)
         return
 
     rows = []
@@ -62,7 +63,7 @@ async def find_group(message: Message, state: FSMContext, api: RusoilAPI):
     await state.set_state(UserState.waiting_for_group_choice)
 
 @router.callback_query(UserState.waiting_for_group_choice, F.data.startswith("group:"))
-async def process_group_choice(callback: CallbackQuery, state: FSMContext, api: RusoilAPI):
+async def process_group_choice(callback: CallbackQuery, state: FSMContext):
     if not callback.data or not isinstance(callback.message, Message):
         return
 
@@ -73,14 +74,14 @@ async def process_group_choice(callback: CallbackQuery, state: FSMContext, api: 
         await callback.message.delete()
         return
 
-    await update_group(callback.message, state, api, group_name)
+    await update_group(callback.message, state, group_name)
 
     await callback.answer()  # убрать "часики" на кнопке
     await callback.message.delete()
 
 
 @router.callback_query(UserState.waiting_subgroup, F.data.startswith("subgroup:"))
-async def process_subgroup_choice(callback: CallbackQuery, state: FSMContext, api: RusoilAPI):
+async def process_subgroup_choice(callback: CallbackQuery, state: FSMContext):
     if not callback.data or not isinstance(callback.message, Message):
         return
 
