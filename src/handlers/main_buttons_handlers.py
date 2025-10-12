@@ -95,7 +95,7 @@ def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from
     lines.append(f"📅 Расписание на {day_name} ({group}):\n")
 
     for les in day_obj.lessons:
-        if les.subgroup and int(les.subgroup) != subgroup:
+        if subgroup != -1 and les.subgroup and int(les.subgroup) != subgroup:
             continue
 
         subgroup_text = f"  👥 Подгруппа: {les.subgroup}\n" if les.subgroup else ""

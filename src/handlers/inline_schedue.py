@@ -64,14 +64,14 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
         )
 
     if text and len(text) > 2:
-        groups, _ = await api.GetGroups(text, cache_ttl=60**2)
+        groups, _ = await api.GetGroups(text, cache_ttl=86400 * 30) # 30 days
         if groups:
             curID = 0
-            for i in range(0, len(groups[:18])):
+            for i in range(0, len(groups[:10])):
                 try:
                     group = groups[i].name
-                    days, days_from_cache = await api.GetSchedule(groups[i].name, now.week_number, 300)
-                    subgroup=1
+                    days, days_from_cache = await api.GetSchedule(groups[i].name, now.week_number, 3600 * 2) # 2 hours
+                    subgroup = -1
 
                     if now.day_of_week == 7:
                         tommorowDays, tommorowDays_from_cache = await api.GetSchedule(group, now.week_number + 1, 300)
