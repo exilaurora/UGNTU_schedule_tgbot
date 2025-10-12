@@ -14,7 +14,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
 
     now, now_cache = await api.GetNow() # get_now_safe(api)
     if not now:
-        query.answer(results, cache_time=60, is_personal=True)
+        query.answer(results, cache_time=1, is_personal=True)
         return
 
     data = await state.get_data()
@@ -31,7 +31,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
             tommorowDays, tommorowDays_from_cache = days, days_from_cache
 
         if not days:
-            query.answer(results, cache_time=60, is_personal=True)
+            query.answer(results, cache_time=1, is_personal=True)
             return
 
         today_obj = next((d for d in days if d.day_of_week == now.day_of_week), None)
@@ -74,7 +74,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
                     subgroup=1
 
                     if now.day_of_week == 7:
-                        tommorowDays, tommorowDays_from_cache = await api.GetSchedule(group, now.week_number + 1)
+                        tommorowDays, tommorowDays_from_cache = await api.GetSchedule(group, now.week_number + 1, 300)
                     else:
                         tommorowDays, tommorowDays_from_cache = days, days_from_cache
 
@@ -110,4 +110,4 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
 
         pass
 
-    await query.answer(results, cache_time=1, is_personal=True)
+    await query.answer(results, cache_time=120, is_personal=True)
