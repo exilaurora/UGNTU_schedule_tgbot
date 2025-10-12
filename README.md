@@ -14,6 +14,7 @@
 - 💾 Кэширование расписания при недоступности API  
 - 🧠 Хранение состояний и данных в **MongoDB**  
 - ⚙️ Полностью асинхронный стек: `aiogram`, `aiohttp`, `motor`
+-    Поддержка inline query
 
 ---
 
@@ -86,6 +87,7 @@ services:
       - MONGO_PASSWORD=mypassword
       - MONGO_DB=mydatabase
       - BOT_TOKEN=YOUR_TOKEN
+      - ADMIN_USERID=1234567
     depends_on:
       - mongo
     networks:
