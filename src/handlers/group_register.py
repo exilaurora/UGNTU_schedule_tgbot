@@ -33,7 +33,15 @@ async def find_group(message: Message, state: FSMContext, api: RusoilSafeAPI):
         return
     group_name = message.text.strip()
 
-    groups, _ = await api.GetGroups(group_name) # api.get_groups(group_name)
+    if len(group_name) < 2:
+        await message.answer("Слишком короткое название группы.")
+        return
+
+    try:
+        groups, _ = await api.GetGroups(group_name) # api.get_groups(group_name)
+    except:
+        await message.answer("Произошла ошибка. Попробуй еще раз")
+        return
 
     if not groups:
         await message.answer("Группа не найдена. Попробуй еще раз")

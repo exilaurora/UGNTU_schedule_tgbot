@@ -129,8 +129,9 @@ def make_day_keyboard(week: int, day: int, group: str, subgroup: int) -> InlineK
 
 @router.message(GroupConfigured(), lambda message: message.text == "📅 Расписание на сегодня")
 async def schedule_today(message: Message, state: FSMContext, api: RusoilSafeAPI):
-    now, now_from_cache = await api.GetNow() # get_now_safe(api)
-    if not now:
+    try:
+        now, now_from_cache = await api.GetNow() # get_now_safe(api)
+    except:
         await message.reply("⚠️ Не удалось получить текущую дату, и кэш пуст.")
         return
 
@@ -138,8 +139,9 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilSafeAPI
     group = data["group"]
     subgroup = data.get("subgroup", 0)
 
-    days, days_from_cache = await api.GetSchedule(group, now.week_number) # get_schedule_safe(api, group, now.week_number)
-    if not days:
+    try:
+        days, days_from_cache = await api.GetSchedule(group, now.week_number) # get_schedule_safe(api, group, now.week_number)
+    except:
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return
 
@@ -165,16 +167,18 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafe
     now_from_cache = False
 
     if week == -1 and day == -1:
-        now, now_from_cache = await api.GetNow() # get_now_safe(api)
-        if not now:
+        try:
+            now, now_from_cache = await api.GetNow() # get_now_safe(api)
+        except:
             await message.answer("⚠️ Не удалось получить текущий день, и кэш пуст.")
             return
         week = now.week_number
         day = now.day_of_week
         day_data.update({"w": now.week_number, "d": now.day_of_week})
 
-    days, days_from_cache = await api.GetSchedule(group, week) # get_schedule_safe(api, group, week)
-    if not days:
+    try:
+        days, days_from_cache = await api.GetSchedule(group, week) # get_schedule_safe(api, group, week)
+    except:
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return
 
