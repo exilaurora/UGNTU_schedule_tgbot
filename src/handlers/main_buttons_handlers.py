@@ -168,7 +168,8 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafe
 
     if week == -1 and day == -1:
         try:
-            now, now_from_cache = await api.GetNow() # get_now_safe(api)
+            now, using_cache = await api.GetNow() # get_now_safe(api)
+            now_from_cache = using_cache
         except:
             await message.answer("⚠️ Не удалось получить текущий день, и кэш пуст.")
             return
