@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
 from aiogram.fsm.context import FSMContext
-from .main_buttons_handlers import get_now_safe, get_schedule_safe, render_schedule_text, days_names
+from .main_buttons_handlers import render_schedule_text, days_names
 from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 
 router = Router()
