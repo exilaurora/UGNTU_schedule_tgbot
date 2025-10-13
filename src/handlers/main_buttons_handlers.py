@@ -32,57 +32,6 @@ days_names = {
 }
 
 # === Утилиты ===
-
-async def get_now_safe(api: RusoilAPI) -> tuple[Optional[NowInfo], bool]:
-    global now_cache
-    now_ts = time.time()
-
-    if now_cache["data"] and now_ts - now_cache["time"] < CACHE_TTL:
-        logging.info("[CACHE] Используем кэш now_cache")
-        return now_cache["data"], False
-
-    try:
-        now = await api.get_now()
-        now_cache["data"] = now
-        now_cache["time"] = now_ts
-        logging.info("[CACHE] Обновлен now_cache")
-        return now, False
-    except Exception as e:
-        logging.warning(f"[WARN] API недоступен: {e}")
-        if now_cache["data"]:
-            logging.info(f"[CACHE] Используем просроченные данные для now_cache")
-            return now_cache["data"], True
-        return None, True
-
-
-async def get_schedule_safe(api: RusoilAPI, group: str, week: int) -> tuple[Optional[list], bool]:
-    """
-    Безопасное получение расписания с кэшем и TTL.
-    Возвращает данные из кэша, если прошло < CACHE_TTL секунд.
-    """
-    cache_key = (group, week)
-    entry = cache.get(cache_key)
-
-    # проверка на актуальность
-    if entry and time.time() - entry["time"] < CACHE_TTL:
-        logging.info(f"[CACHE] Используем кэш: {cache_key}")
-        return entry["days"], False
-
-    # иначе пробуем запросить с API
-    try:
-        days = await api.get_schedule(group, week, week)
-        cache[cache_key] = {"days": days, "time": time.time()}
-        logging.info(f"[CACHE] Обновлено: {cache_key}")
-        return days, False
-    except Exception as e:
-        logging.warning(f"[WARN] API недоступен: {e}")
-        # если есть хоть что-то старое — используем
-        if entry:
-            logging.info(f"[CACHE] Используем просроченные данные: {cache_key}")
-            return entry["days"], True
-        return None, True
-
-
 def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from_cache: bool = False) -> str:
     if not day_obj or not day_obj.lessons:
         return f"📅 Расписание на {day_name} ({group}):\n\n" \
