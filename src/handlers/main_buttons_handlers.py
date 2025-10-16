@@ -120,6 +120,7 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafe
             now, using_cache = await api.GetNow() # get_now_safe(api)
             now_from_cache = using_cache
         except:
+            await callback.answer()
             await message.answer("⚠️ Не удалось получить текущий день, и кэш пуст.")
             return
         week = now.week_number
@@ -129,6 +130,7 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafe
     try:
         days, days_from_cache = await api.GetSchedule(group, week) # get_schedule_safe(api, group, week)
     except:
+        await callback.answer()
         await message.reply("⚠️ Не удалось получить расписание, и кэш пуст.")
         return
 
