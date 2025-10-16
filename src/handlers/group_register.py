@@ -38,7 +38,7 @@ async def find_group(message: Message, state: FSMContext, api: RusoilSafeAPI):
         return
 
     try:
-        groups, _ = await api.GetGroups(group_name) # api.get_groups(group_name)
+        groups, _ = await api.GetGroups(group_name, cache_ttl=60**2 * 2) # 2 hours
     except:
         await message.answer("Произошла ошибка. Попробуй еще раз")
         return
