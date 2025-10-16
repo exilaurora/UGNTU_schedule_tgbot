@@ -13,11 +13,17 @@ async def command_start(message: Message, state: FSMContext):
     if not user:
         return
     
+    # Получение username'a бота
+    if not message.bot:
+        return
+    me = await message.bot.get_me()
+    bot_username = "@" + (me.username or "unknown")
+
     await message.answer(f"""Привет! Я помогу следить тебе за расписанием.
                          
 Я буду работать даже если API УГНТУ недоступен, ведь я поддерживаю кэширование данных.
 
-Я поддерживаю inline query. просто напиши {html.code('@ugntu_raspbot')} в любом чате.
+Я поддерживаю inline query. просто напиши {html.code(bot_username)} в любом чате.
 Можно написать название группы, если нужно расписание другой группы.
 
 Ты можешь отслеживать расписание сразу нескольких групп.
