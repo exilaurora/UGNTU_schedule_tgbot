@@ -1,4 +1,4 @@
-from aiogram import Router, html, F
+from aiogram import Router, html
 from aiogram.filters import CommandStart
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext

@@ -1,7 +1,4 @@
 import json
-import time
-import logging
-from typing import Optional
 
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
@@ -9,7 +6,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
 from filters.group_configured import GroupConfigured
-from rusoil_api.rusoil_baseapi import RusoilAPI, NowInfo
 from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
 from states.user_state import UserState
 
@@ -17,9 +13,6 @@ from states.user_state import UserState
 router = Router()
 
 # === Конфигурация ===
-CACHE_TTL = 60.0  # секунды
-cache: dict[tuple[str, int], dict] = {}
-now_cache: dict = {"data": None, "time": 0}
 
 days_names = {
     1: "Понедельник",
