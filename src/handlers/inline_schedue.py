@@ -46,7 +46,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
 
         results.append(InlineQueryResultArticle(
             id = "1",
-            title = f"Расписание на сегодня для {group}",
+            title = f"Сегодня для {group}",
             input_message_content = InputTextMessageContent(
                 message_text=todayRaspText
             ),
@@ -55,7 +55,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
         )
         results.append(InlineQueryResultArticle(
             id = "2",
-            title = f"Расписание на завтра для {group}",
+            title = f"Завтра для {group}",
             input_message_content = InputTextMessageContent(
                 message_text=tommorowRaspText
             ),
@@ -88,7 +88,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
 
                     results.append(InlineQueryResultArticle(
                         id = str(curID),
-                        title = f"Расписание на сегодня для {group}",
+                        title = f"Сегодня для {group}",
                         input_message_content = InputTextMessageContent(
                             message_text=todayRaspText
                         ),
@@ -97,7 +97,7 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
                     )
                     results.append(InlineQueryResultArticle(
                         id = str(curID + 1),
-                        title = f"Расписание на завтра для {group}",
+                        title = f"Завтра для {group}",
                         input_message_content = InputTextMessageContent(
                             message_text=tommorowRaspText
                         ),
@@ -110,4 +110,4 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
 
         pass
 
-    await query.answer(results, cache_time=120, is_personal=True)
+    await query.answer(results, cache_time=300, is_personal=True)
