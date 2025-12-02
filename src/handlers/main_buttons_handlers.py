@@ -1,12 +1,13 @@
 import json
 
-from aiogram import Router, F
+from aiogram import Router, F, html
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
 from filters.group_configured import GroupConfigured
 from rusoil_api.rusoil_cachingapi import RusoilSafeAPI
+from rusoil_api.rusoil_baseapi import Day
 from states.user_state import UserState
 
 
@@ -25,7 +26,7 @@ days_names = {
 }
 
 # === Утилиты ===
-def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from_cache: bool = False) -> str:
+def render_schedule_text(group: str, day_obj: Day, day_name: str, subgroup: int, from_cache: bool = False) -> str:
     lines = []
     if from_cache:
         lines.append("⚠️ API УГНТУ не доступен. Используются данные из кэша\n")
@@ -39,6 +40,8 @@ def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from
     for les in day_obj.lessons:
         if subgroup != -1 and les.subgroup and int(les.subgroup) != subgroup and int(les.subgroup) < 2:
             continue
+        if les.lesson_type.lower() == "экзамен":
+            les.lesson_type = html.bold("‼️Экзамен‼️")
 
         subgroup_text = f"  👥 Подгруппа: {les.subgroup}\n" if les.subgroup and int(les.subgroup) <= 2 else ""
         lines.append(
@@ -88,6 +91,8 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilSafeAPI
         return
 
     today_obj = next((d for d in days if d.day_of_week == now.day_of_week), None)
+    if not today_obj:
+        return
     text = render_schedule_text(group, today_obj, days_names[now.day_of_week], subgroup, True if now_from_cache or days_from_cache else False)
     await message.answer(text, reply_markup=make_day_keyboard(now.week_number, now.day_of_week, group, subgroup))
 
@@ -128,6 +133,8 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafe
         return
 
     today_obj = next((d for d in days if d.day_of_week == day), None)
+    if not today_obj:
+        return
     text = render_schedule_text(group, today_obj, days_names[day], subgroup, True if now_from_cache or days_from_cache else False)
     try:
         await message.edit_text(text, reply_markup=make_day_keyboard(week, day, group, subgroup))

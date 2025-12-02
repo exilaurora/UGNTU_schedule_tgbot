@@ -36,10 +36,16 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
 
         today_obj = next((d for d in days if d.day_of_week == now.day_of_week), None)
 
+        if not today_obj:
+            return
+
         todayRaspText = render_schedule_text(group, today_obj, days_names[now.day_of_week], subgroup, True if days_from_cache or now_cache else False)
 
 
         tommorow_obj = next((d for d in tommorowDays if d.day_of_week == (now.day_of_week + 1 if now.day_of_week < 7 else 1)), None)
+
+        if not tommorow_obj:
+            return
 
         tommorowRaspText = render_schedule_text(group, tommorow_obj, days_names[now.day_of_week + 1 if now.day_of_week < 7 else 1], subgroup, True if days_from_cache or now_cache or tommorowDays_from_cache else False)
 
@@ -79,10 +85,17 @@ async def inline_query_handler(query: InlineQuery, state: FSMContext, api: Rusoi
                         tommorowDays, tommorowDays_from_cache = days, days_from_cache
 
                     today_obj = next((d for d in days if d.day_of_week == now.day_of_week), None)
+
+                    if not today_obj:
+                        return
+
                     todayRaspText = render_schedule_text(group, today_obj, days_names[now.day_of_week], subgroup, True if days_from_cache or now_cache else False)
 
 
                     tommorow_obj = next((d for d in tommorowDays if d.day_of_week == (now.day_of_week + 1 if now.day_of_week < 7 else 1)), None)
+
+                    if not tommorow_obj:
+                        return
 
                     tommorowRaspText = render_schedule_text(group, tommorow_obj, days_names[now.day_of_week + 1 if now.day_of_week < 7 else 1], subgroup, True if days_from_cache or now_cache or tommorowDays_from_cache else False)
 
