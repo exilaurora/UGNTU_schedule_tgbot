@@ -37,10 +37,10 @@ def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from
         return "\n".join(lines)
 
     for les in day_obj.lessons:
-        if subgroup != -1 and les.subgroup and int(les.subgroup) != subgroup:
+        if subgroup != -1 and les.subgroup and int(les.subgroup) != subgroup and int(les.subgroup) < 2:
             continue
 
-        subgroup_text = f"  👥 Подгруппа: {les.subgroup}\n" if les.subgroup else ""
+        subgroup_text = f"  👥 Подгруппа: {les.subgroup}\n" if les.subgroup and int(les.subgroup) <= 2 else ""
         lines.append(
             f"[{les.para} пара] {les.lesson_type}\n"
             f"  📘 {les.discipline}\n"
