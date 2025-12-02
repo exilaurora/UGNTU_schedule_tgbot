@@ -39,7 +39,7 @@ class RusoilSafeAPI(API.RusoilAPI):
             return data, False
         except Exception as e:
             if entry:
-                return entry["data"]
+                return entry["data"], True
             raise(e)
         
     async def GetNow(self, cache_ttl: int = 60) -> tuple[API.NowInfo, bool]:
@@ -56,5 +56,5 @@ class RusoilSafeAPI(API.RusoilAPI):
             return data, False
         except Exception as e:
             if entry["data"]:
-                return entry["data"]
+                return entry["data"], True
             raise e

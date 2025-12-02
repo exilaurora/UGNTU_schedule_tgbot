@@ -26,15 +26,15 @@ days_names = {
 
 # === Утилиты ===
 def render_schedule_text(group: str, day_obj, day_name: str, subgroup: int, from_cache: bool = False) -> str:
-    if not day_obj or not day_obj.lessons:
-        return f"📅 Расписание на {day_name} ({group}):\n\n" \
-               "Пар нет 🎉"
-
     lines = []
     if from_cache:
         lines.append("⚠️ API УГНТУ не доступен. Используются данные из кэша\n")
 
     lines.append(f"📅 Расписание на {day_name} ({group}):\n")
+
+    if not day_obj or not day_obj.lessons:
+        lines.append("Пар нет 🎉")
+        return "\n".join(lines)
 
     for les in day_obj.lessons:
         if subgroup != -1 and les.subgroup and int(les.subgroup) != subgroup:
