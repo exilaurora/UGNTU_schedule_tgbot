@@ -26,7 +26,7 @@ days_names = {
 }
 
 # === Утилиты ===
-def render_schedule_text(group: str, day_obj: Day, day_name: str, subgroup: int, from_cache: bool = False) -> str:
+def render_schedule_text(group: str, day_obj: Day | None, day_name: str, subgroup: int, from_cache: bool = False) -> str:
     lines = []
     if from_cache:
         lines.append("⚠️ API УГНТУ не доступен. Используются данные из кэша\n")
@@ -91,8 +91,6 @@ async def schedule_today(message: Message, state: FSMContext, api: RusoilSafeAPI
         return
 
     today_obj = next((d for d in days if d.day_of_week == now.day_of_week), None)
-    if not today_obj:
-        return
     text = render_schedule_text(group, today_obj, days_names[now.day_of_week], subgroup, True if now_from_cache or days_from_cache else False)
     await message.answer(text, reply_markup=make_day_keyboard(now.week_number, now.day_of_week, group, subgroup))
 
@@ -133,8 +131,6 @@ async def change_day(callback: CallbackQuery, state: FSMContext, api: RusoilSafe
         return
 
     today_obj = next((d for d in days if d.day_of_week == day), None)
-    if not today_obj:
-        return
     text = render_schedule_text(group, today_obj, days_names[day], subgroup, True if now_from_cache or days_from_cache else False)
     try:
         await message.edit_text(text, reply_markup=make_day_keyboard(week, day, group, subgroup))
