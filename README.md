@@ -83,8 +83,8 @@ services:
     environment:
       - MONGO_HOST=mongo
       - MONGO_PORT=27017
-      - MONGO_USER=root
-      - MONGO_PASSWORD=rootpassword
+      - MONGO_USER=myuser
+      - MONGO_PASSWORD=mypassword
       - MONGO_DB=mydatabase
       - BOT_TOKEN=YOUR_TOKEN
       - ADMIN_USERID=1234567
