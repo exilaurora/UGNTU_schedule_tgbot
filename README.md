@@ -75,7 +75,7 @@ docker compose up -d
 ```yaml
 services:
   rasp_bot:
-    image: rasp_bot
+    image: ghcr.io/exilaurora/ugntu_schedule_tgbot:latest
     container_name: rasp_bot
     volumes:
       - ./src:/usr/src/app
@@ -83,8 +83,8 @@ services:
     environment:
       - MONGO_HOST=mongo
       - MONGO_PORT=27017
-      - MONGO_USER=myuser
-      - MONGO_PASSWORD=mypassword
+      - MONGO_USER=root
+      - MONGO_PASSWORD=rootpassword
       - MONGO_DB=mydatabase
       - BOT_TOKEN=YOUR_TOKEN
       - ADMIN_USERID=1234567
